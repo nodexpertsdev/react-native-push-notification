@@ -47,6 +47,7 @@ dependencies {
     compile ('com.google.android.gms:play-services-gcm:8.1.0') {
         force = true;
     }
+    implementation 'com.facebook.fresco:fresco:1.8.1'
 }
 ```
 
