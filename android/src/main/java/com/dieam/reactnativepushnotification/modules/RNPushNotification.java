@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 public class RNPushNotification extends ReactContextBaseJavaModule implements ActivityEventListener {
     public static final String LOG_TAG = "RNPushNotification";// all logging should use this tag
 
@@ -68,7 +70,8 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
     }
 
     private void registerNotificationsRegistration() {
-        IntentFilter intentFilter = new IntentFilter(getReactApplicationContext().getPackageName() + ".RNPushNotificationRegisteredToken");
+        IntentFilter intentFilter = new IntentFilter(
+                getReactApplicationContext().getPackageName() + ".RNPushNotificationRegisteredToken");
 
         getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
             @Override
@@ -98,7 +101,8 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
                 mJsDelivery.notifyNotificationAction(bundle);
 
                 // Dismiss the notification popup.
-                NotificationManager manager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+                NotificationManager manager = (NotificationManager) context
+                        .getSystemService(context.NOTIFICATION_SERVICE);
                 int notificationID = Integer.parseInt(bundle.getString("id"));
                 manager.cancel(notificationID);
             }
@@ -113,6 +117,11 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
 
         GCMService.putExtra("senderID", senderID);
         reactContext.startService(GCMService);
+    }
+
+    @ReactMethod
+    public void subscribeToTopic(String topic) {
+        FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 
     @ReactMethod
@@ -156,25 +165,30 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
         ApplicationBadgeHelper.INSTANCE.setApplicationIconBadgeNumber(getReactApplicationContext(), number);
     }
 
-    // removed @Override temporarily just to get it working on different versions of RN
+    // removed @Override temporarily just to get it working on different versions of
+    // RN
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
         onActivityResult(requestCode, resultCode, data);
     }
 
-    // removed @Override temporarily just to get it working on different versions of RN
+    // removed @Override temporarily just to get it working on different versions of
+    // RN
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Ignored, required to implement ActivityEventListener for RN 0.33
     }
 
     @ReactMethod
     /**
-     * Cancels all scheduled local notifications, and removes all entries from the notification
-     * centre.
+     * Cancels all scheduled local notifications, and removes all entries from the
+     * notification centre.
      *
      * We're attempting to keep feature parity with the RN iOS implementation in
-     * <a href="https://github.com/facebook/react-native/blob/master/Libraries/PushNotificationIOS/RCTPushNotificationManager.m#L289">RCTPushNotificationManager</a>.
+     * <a href=
+     * "https://github.com/facebook/react-native/blob/master/Libraries/PushNotificationIOS/RCTPushNotificationManager.m#L289">RCTPushNotificationManager</a>.
      *
-     * @see <a href="https://facebook.github.io/react-native/docs/pushnotificationios.html">RN docs</a>
+     * @see <a href=
+     *      "https://facebook.github.io/react-native/docs/pushnotificationios.html">RN
+     *      docs</a>
      */
     public void cancelAllLocalNotifications() {
         mRNPushNotificationHelper.cancelAllScheduledNotifications();
@@ -183,12 +197,15 @@ public class RNPushNotification extends ReactContextBaseJavaModule implements Ac
 
     @ReactMethod
     /**
-     * Cancel scheduled notifications, and removes notifications from the notification centre.
+     * Cancel scheduled notifications, and removes notifications from the
+     * notification centre.
      *
-     * Note - as we are trying to achieve feature parity with iOS, this method cannot be used
-     * to remove specific alerts from the notification centre.
+     * Note - as we are trying to achieve feature parity with iOS, this method
+     * cannot be used to remove specific alerts from the notification centre.
      *
-     * @see <a href="https://facebook.github.io/react-native/docs/pushnotificationios.html">RN docs</a>
+     * @see <a href=
+     *      "https://facebook.github.io/react-native/docs/pushnotificationios.html">RN
+     *      docs</a>
      */
     public void cancelLocalNotifications(ReadableMap userInfo) {
         mRNPushNotificationHelper.cancelScheduledNotification(userInfo);
